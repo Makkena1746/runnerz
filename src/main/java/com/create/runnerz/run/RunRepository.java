@@ -3,9 +3,7 @@ package com.create.runnerz.run;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,5 +25,18 @@ public class RunRepository {
 
     public Optional<Run> findById(int id) {
         return runs.stream().filter(run -> run.id() == id).findFirst();
+    }
+
+    void addRun(Run run) {
+        runs.add(run);
+    }
+
+    void updateRun(Run run, Integer id) {
+        Optional<Run> existingRun = findById(id);
+        existingRun.ifPresent(value -> runs.set(runs.indexOf(value), run));
+    }
+
+    void deleteRun(Integer id) {
+        runs.removeIf(run -> run.id().equals(id));
     }
 }

@@ -1,11 +1,8 @@
 package com.create.runnerz.run;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +22,7 @@ public class RunController {
         return "Welcome to Runnerz Application";
     }
 
-    @GetMapping
+    @GetMapping("")
     public List<Run> runs() {
         return runRepository.getRuns();
     }
@@ -34,9 +31,27 @@ public class RunController {
     public Run findById(@PathVariable Integer id) {
         Optional<Run> run = runRepository.findById(id);
         if (run.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new RunNotFoundException();
         } else {
             return run.get();
         }
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("")
+    void addRun(@Valid @RequestBody Run run) {
+        runRepository.addRun(run);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/{id}")
+    void updateRun(@Valid @RequestBody Run run, @PathVariable Integer id) {
+        runRepository.updateRun(run, id);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    void deleteRun(@PathVariable Integer id) {
+        runRepository.deleteRun(id);
     }
 }
