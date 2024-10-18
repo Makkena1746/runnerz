@@ -11,10 +11,13 @@ import java.util.Optional;
 @RequestMapping("/api/runs")
 public class RunController {
 
+    private final JdbcClientRunRepository jdbcClientRunRepository;
+
     private final RunRepository runRepository;
 
-    public RunController(RunRepository repository) {
-        this.runRepository = repository;
+    public RunController(JdbcClientRunRepository repository, RunRepository runRepository) {
+        this.jdbcClientRunRepository = repository;
+        this.runRepository = runRepository;
     }
 
     @GetMapping("/home")
@@ -24,11 +27,13 @@ public class RunController {
 
     @GetMapping("")
     public List<Run> runs() {
-        return runRepository.getRuns();
+//        return jdbcClientRunRepository.getRuns();
+        return runRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public Run findById(@PathVariable Integer id) {
+//        Optional<Run> run = jdbcClientRunRepository.findById(id);
         Optional<Run> run = runRepository.findById(id);
         if (run.isEmpty()) {
             throw new RunNotFoundException();
@@ -40,18 +45,33 @@ public class RunController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
     void addRun(@Valid @RequestBody Run run) {
-        runRepository.addRun(run);
+//        jdbcClientRunRepository.addRun(run);
+        runRepository.save(run);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{id}")
     void updateRun(@Valid @RequestBody Run run, @PathVariable Integer id) {
-        runRepository.updateRun(run, id);
+//        jdbcClientRunRepository.updateRun(run, id);
+        runRepository.save(run);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     void deleteRun(@PathVariable Integer id) {
-        runRepository.deleteRun(id);
+//        jdbcClientRunRepository.deleteRun(id);
+        runRepository.deleteById(id);
     }
+
+    @GetMapping("/location/{location}")
+    List<Run> findAllByLocation(@PathVariable Location location) {
+        return runRepository.findAllByLocation(location);
+    }
+
+    @GetMapping("/location/{location}/miles/{miles}")
+    List<Run> findAllByLocationAndMiles(@PathVariable Location location, @PathVariable Integer miles) {
+        return runRepository.findAllByLocationAndMiles(location, miles);
+    }
+
+
 }
